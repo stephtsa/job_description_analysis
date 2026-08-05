@@ -1,0 +1,81 @@
+HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Data Extractor</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .card { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        select, button, input { margin: 10px 0; padding: 8px; width: 100%; }
+        .result-box { background-color: #f4f4f4; padding: 15px; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+
+    <h2>PDF Data Extractor</h2>
+    
+    <!-- Upload Section -->
+    <div class="card">
+        <label for="pdfFile"><strong>Select a PDF Document:</strong></label>
+        <input type="file" id="pdfFile" accept=".pdf">
+        <button onclick="uploadPDF()">Process PDF</button>
+    </div>
+
+    <!-- Data Selector Section -->
+    <div class="card" id="outputArea" style="display:none;">
+        <label for="dataFieldSelect"><strong>Select Extracted Data Point:</strong></label>
+        <select id="dataFieldSelect" onchange="displaySelectedData()">
+            <!-- Dropdown options populated dynamically by JavaScript -->
+        </select>
+
+        <div class="result-box">
+            <h4 id="selectedTitle">Selected Information:</h4>
+            <p id="selectedValue" style="font-size: 1.1em; color: #333;"></p>
+        </div>
+    </div>
+
+    <script>
+        let extractedData = {};
+
+        async function uploadPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            if (fileInput.files.length === 0) {
+                alert("Please select a PDF file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            extractedData = await response.json();
+            
+            // Populate Dropdown Options
+            const selectMenu = document.getElementById('dataFieldSelect');
+            selectMenu.innerHTML = ''; // Clear previous options
+
+            Object.keys(extractedData).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                selectMenu.appendChild(option);
+            });
+
+            // Show output controls and display first item
+            document.getElementById('outputArea').style.display = 'block';
+            displaySelectedData();
+        }
+
+        function displaySelectedData() {
+            const selectedKey = document.getElementById('dataFieldSelect').value;
+            document.getElementById('selectedTitle').innerText = selectedKey;
+            document.getElementById('selectedValue').innerText = extractedData[selectedKey];
+        }
+    </script>
+</body>
+</html>
