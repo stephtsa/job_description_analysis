@@ -1,0 +1,7 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+streamlit>=1.40.0
+PyMuPDF>=1.27.0
+pandas>=2.0.0
+requests>=2.32.0
